@@ -20,7 +20,7 @@ def init_params(module, n_layers):
     if isinstance(module, nn.Embedding):
         module.weight.data.normal_(mean=0.0, std=0.02)
 
-
+# Obsismc: Centrality Encoding
 class GraphNodeFeature(nn.Module):
     """
     Compute node features for each node in the graph.
@@ -64,13 +64,14 @@ class GraphNodeFeature(nn.Module):
             + self.out_degree_encoder(out_degree)
         )
 
+        # Obsismc: graph_token is for virtual node
         graph_token_feature = self.graph_token.weight.unsqueeze(0).repeat(n_graph, 1, 1)
 
         graph_node_feature = torch.cat([graph_token_feature, node_feature], dim=1)
 
         return graph_node_feature
 
-
+# Obsismc: spatial & edge embedding
 class GraphAttnBias(nn.Module):
     """
     Compute attention bias for each head.
@@ -105,6 +106,7 @@ class GraphAttnBias(nn.Module):
         self.apply(lambda module: init_params(module, n_layers=n_layers))
 
     def forward(self, batched_data):
+        # Obsismc: spatial_pos is the shortest distance? TODO
         attn_bias, spatial_pos, x = (
             batched_data["attn_bias"],
             batched_data["spatial_pos"],

@@ -218,9 +218,9 @@ class GraphormerEncoder(FairseqEncoder):
         inner_states, graph_rep = self.graph_encoder(
             batched_data,
             perturb=perturb,
-        )
+        )  # Obsismc: inner_states may contain outputs of all encoding layers
 
-        x = inner_states[-1].transpose(0, 1)
+        x = inner_states[-1].transpose(0, 1)  # Obsismc: (B,T(number of node),C)
 
         # project masked tokens only
         if masked_tokens is not None:
@@ -238,6 +238,7 @@ class GraphormerEncoder(FairseqEncoder):
         if self.lm_output_learned_bias is not None:
             x = x + self.lm_output_learned_bias
 
+        # Obsismc: whether only use virtual node to predict TODO
         return x
 
     def max_nodes(self):

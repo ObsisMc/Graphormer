@@ -17,7 +17,7 @@ from fairseq.modules.quant_noise import quant_noise
 
 from .multihead_attention import MultiheadAttention
 
-
+# Obsismc: the second half of attention, add attn_bias into it
 class GraphormerGraphEncoderLayer(nn.Module):
     def __init__(
         self,

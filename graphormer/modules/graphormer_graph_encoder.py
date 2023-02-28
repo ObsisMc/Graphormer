@@ -106,6 +106,7 @@ class GraphormerGraphEncoder(nn.Module):
 
         self.embed_scale = embed_scale
 
+        # Obsismc: what does noise mean? TODO
         if q_noise > 0:
             self.quant_noise = apply_quant_noise_(
                 nn.Linear(self.embedding_dim, self.embedding_dim, bias=False),
@@ -197,6 +198,8 @@ class GraphormerGraphEncoder(nn.Module):
         token_embeddings: Optional[torch.Tensor] = None,
         attn_mask: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
+        # Obsismc: according to GraphormerEncoder class in graphormer.py, attn_mask seems always None? TODO
+
         is_tpu = False
         # compute padding mask. This is needed for multi-head attention
         data_x = batched_data["x"]
@@ -211,6 +214,7 @@ class GraphormerGraphEncoder(nn.Module):
         if token_embeddings is not None:
             x = token_embeddings
         else:
+            # Obsismc: combine centrality embedding before attention
             x = self.graph_node_feature(batched_data)
 
         if perturb is not None:
@@ -219,7 +223,7 @@ class GraphormerGraphEncoder(nn.Module):
             x[:, 1:, :] += perturb
 
         # x: B x T x C
-
+        # Obsismc: the attn bias is added in the following loop
         attn_bias = self.graph_attn_bias(batched_data)
 
         if self.embed_scale is not None:
