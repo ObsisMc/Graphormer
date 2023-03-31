@@ -7,7 +7,6 @@ cimport numpy
 import numpy
 
 def floyd_warshall(adjacency_matrix):
-
     (nrows, ncols) = adjacency_matrix.shape
     assert nrows == ncols
     cdef unsigned int n = nrows
@@ -19,9 +18,9 @@ def floyd_warshall(adjacency_matrix):
 
     cdef unsigned int i, j, k
     cdef long M_ij, M_ik, cost_ikkj
-    cdef long* M_ptr = &M[0,0]
-    cdef long* M_i_ptr
-    cdef long* M_k_ptr
+    cdef long * M_ptr = &M[0, 0]
+    cdef long * M_i_ptr
+    cdef long * M_k_ptr
 
     # set unreachable nodes distance to 510
     for i in range(n):
@@ -33,9 +32,9 @@ def floyd_warshall(adjacency_matrix):
 
     # floyed algo
     for k in range(n):
-        M_k_ptr = M_ptr + n*k
+        M_k_ptr = M_ptr + n * k
         for i in range(n):
-            M_i_ptr = M_ptr + n*i
+            M_i_ptr = M_ptr + n * i
             M_ik = M_i_ptr[k]
             for j in range(n):
                 cost_ikkj = M_ik + M_k_ptr[j]
@@ -53,7 +52,6 @@ def floyd_warshall(adjacency_matrix):
 
     return M, path
 
-
 def get_all_edges(path, i, j):
     cdef int k = path[i][j]
     if k == -1:
@@ -61,9 +59,7 @@ def get_all_edges(path, i, j):
     else:
         return get_all_edges(path, i, k) + [k] + get_all_edges(path, k, j)
 
-
 def gen_edge_input(max_dist, path, edge_feat):
-
     (nrows, ncols) = path.shape
     assert nrows == ncols
     cdef unsigned int n = nrows
@@ -74,7 +70,9 @@ def gen_edge_input(max_dist, path, edge_feat):
     assert path_copy.flags['C_CONTIGUOUS']
     assert edge_feat_copy.flags['C_CONTIGUOUS']
 
-    cdef numpy.ndarray[long, ndim=4, mode='c'] edge_fea_all = -1 * numpy.ones([n, n, max_dist_copy, edge_feat.shape[-1]], dtype=numpy.int64)
+    # Obsismc: edge_fea_all is [N,N,max_dist,num_edge_feat], containing all edges' feature along the shortest path between node 1 and node 2
+    cdef numpy.ndarray[long, ndim=4, mode='c'] edge_fea_all = -1 * numpy.ones(
+        [n, n, max_dist_copy, edge_feat.shape[-1]], dtype=numpy.int64)
     cdef unsigned int i, j, k, num_path, cur
 
     for i in range(n):
@@ -86,6 +84,6 @@ def gen_edge_input(max_dist, path, edge_feat):
             path = [i] + get_all_edges(path_copy, i, j) + [j]
             num_path = len(path) - 1
             for k in range(num_path):
-                edge_fea_all[i, j, k, :] = edge_feat_copy[path[k], path[k+1], :]
+                edge_fea_all[i, j, k, :] = edge_feat_copy[path[k], path[k + 1], :]
 
     return edge_fea_all

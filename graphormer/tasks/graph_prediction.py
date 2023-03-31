@@ -138,6 +138,7 @@ class GraphPredictionTask(FairseqTask):
 
     def __init__(self, cfg):
         super().__init__(cfg)
+        print("In GraphPredictionTask")
         if cfg.user_data_dir != "":
             self.__import_user_defined_datasets(cfg.user_data_dir)
             if cfg.dataset_name in DATASET_REGISTRY:

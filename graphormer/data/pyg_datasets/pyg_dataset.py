@@ -26,6 +26,7 @@ class GraphormerPYGDataset(Dataset):
         valid_set=None,
         test_set=None,
     ):
+        print("pygdataset")
         self.dataset = dataset
         if self.dataset is not None:
             self.num_data = len(self.dataset)
@@ -98,6 +99,7 @@ class GraphormerPYGDataset(Dataset):
             item = self.dataset[idx]
             item.idx = idx
             item.y = item.y.reshape(-1)
+            # print("before preprocess: x", item.x.shape)
             return preprocess_item(item)
         else:
             raise TypeError("index to a GraphormerPYGDataset can only be an integer.")

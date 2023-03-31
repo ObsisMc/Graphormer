@@ -147,4 +147,6 @@ class GraphormerGraphEncoderLayer(nn.Module):
         x = residual + x
         if not self.pre_layernorm:
             x = self.final_layer_norm(x)
+
+        # print("encoder layer output shape", x.shape)
         return x, attn

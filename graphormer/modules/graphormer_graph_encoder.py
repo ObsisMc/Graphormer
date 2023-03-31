@@ -44,34 +44,34 @@ def init_graphormer_params(module):
 
 class GraphormerGraphEncoder(nn.Module):
     def __init__(
-        self,
-        num_atoms: int,
-        num_in_degree: int,
-        num_out_degree: int,
-        num_edges: int,
-        num_spatial: int,
-        num_edge_dis: int,
-        edge_type: str,
-        multi_hop_max_dist: int,
-        num_encoder_layers: int = 12,
-        embedding_dim: int = 768,
-        ffn_embedding_dim: int = 768,
-        num_attention_heads: int = 32,
-        dropout: float = 0.1,
-        attention_dropout: float = 0.1,
-        activation_dropout: float = 0.1,
-        layerdrop: float = 0.0,
-        encoder_normalize_before: bool = False,
-        pre_layernorm: bool = False,
-        apply_graphormer_init: bool = False,
-        activation_fn: str = "gelu",
-        embed_scale: float = None,
-        freeze_embeddings: bool = False,
-        n_trans_layers_to_freeze: int = 0,
-        export: bool = False,
-        traceable: bool = False,
-        q_noise: float = 0.0,
-        qn_block_size: int = 8,
+            self,
+            num_atoms: int,
+            num_in_degree: int,
+            num_out_degree: int,
+            num_edges: int,
+            num_spatial: int,
+            num_edge_dis: int,
+            edge_type: str,
+            multi_hop_max_dist: int,
+            num_encoder_layers: int = 12,
+            embedding_dim: int = 768,
+            ffn_embedding_dim: int = 768,
+            num_attention_heads: int = 32,
+            dropout: float = 0.1,
+            attention_dropout: float = 0.1,
+            activation_dropout: float = 0.1,
+            layerdrop: float = 0.0,
+            encoder_normalize_before: bool = False,
+            pre_layernorm: bool = False,
+            apply_graphormer_init: bool = False,
+            activation_fn: str = "gelu",
+            embed_scale: float = None,
+            freeze_embeddings: bool = False,
+            n_trans_layers_to_freeze: int = 0,
+            export: bool = False,
+            traceable: bool = False,
+            q_noise: float = 0.0,
+            qn_block_size: int = 8,
     ) -> None:
 
         super().__init__()
@@ -163,18 +163,18 @@ class GraphormerGraphEncoder(nn.Module):
             freeze_module_params(self.layers[layer])
 
     def build_graphormer_graph_encoder_layer(
-        self,
-        embedding_dim,
-        ffn_embedding_dim,
-        num_attention_heads,
-        dropout,
-        attention_dropout,
-        activation_dropout,
-        activation_fn,
-        export,
-        q_noise,
-        qn_block_size,
-        pre_layernorm,
+            self,
+            embedding_dim,
+            ffn_embedding_dim,
+            num_attention_heads,
+            dropout,
+            attention_dropout,
+            activation_dropout,
+            activation_fn,
+            export,
+            q_noise,
+            qn_block_size,
+            pre_layernorm,
     ):
         return GraphormerGraphEncoderLayer(
             embedding_dim=embedding_dim,
@@ -191,12 +191,12 @@ class GraphormerGraphEncoder(nn.Module):
         )
 
     def forward(
-        self,
-        batched_data,
-        perturb=None,
-        last_state_only: bool = False,
-        token_embeddings: Optional[torch.Tensor] = None,
-        attn_mask: Optional[torch.Tensor] = None,
+            self,
+            batched_data,
+            perturb=None,
+            last_state_only: bool = False,
+            token_embeddings: Optional[torch.Tensor] = None,
+            attn_mask: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         # Obsismc: according to GraphormerEncoder class in graphormer.py, attn_mask seems always None? TODO
 
@@ -205,6 +205,12 @@ class GraphormerGraphEncoder(nn.Module):
         data_x = batched_data["x"]
         n_graph, n_node = data_x.size()[:2]
         padding_mask = (data_x[:, :, 0]).eq(0)  # B x T x 1
+        # if not torch.all(padding_mask == 0):
+        #     print("padding mask shape", data_x.shape)
+        #     print("padding mask x", data_x[1, 15:, :].shape)
+        #     tmp = torch.where(padding_mask == 1)
+        #     print("padding mask all zeros: ", list(zip(tmp[0].to("cpu").numpy(), tmp[1].to("cpu").numpy())))
+        #     raise "STOP"
         padding_mask_cls = torch.zeros(
             n_graph, 1, device=padding_mask.device, dtype=padding_mask.dtype
         )
@@ -218,8 +224,8 @@ class GraphormerGraphEncoder(nn.Module):
             x = self.graph_node_feature(batched_data)
 
         if perturb is not None:
-            #ic(torch.mean(torch.abs(x[:, 1, :])))
-            #ic(torch.mean(torch.abs(perturb)))
+            # ic(torch.mean(torch.abs(x[:, 1, :])))
+            # ic(torch.mean(torch.abs(perturb)))
             x[:, 1:, :] += perturb
 
         # x: B x T x C

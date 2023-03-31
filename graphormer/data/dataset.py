@@ -35,6 +35,10 @@ class BatchedDataDataset(FairseqDataset):
         return len(self.dataset)
 
     def collater(self, samples):
+        # for sample in samples:
+        #     print("before collater edge_input shape", sample.edge_input.shape, )
+        # print("")
+
         return collator(
             samples,
             max_node=self.max_node,
@@ -46,6 +50,7 @@ class BatchedDataDataset(FairseqDataset):
 class TargetDataset(FairseqDataset):
     def __init__(self, dataset):
         super().__init__()
+        print("target dataset")
         self.dataset = dataset
 
     @lru_cache(maxsize=16)
@@ -70,6 +75,7 @@ class GraphormerDataset:
         valid_idx = None,
         test_idx = None,
     ):
+        print("graphormer dataset")
         super().__init__()
         if dataset is not None:
             if dataset_source == "dgl":
@@ -99,6 +105,7 @@ class GraphormerDataset:
 class EpochShuffleDataset(BaseWrapperDataset):
     def __init__(self, dataset, num_samples, seed):
         super().__init__(dataset)
+        print("epoch dataset")
         self.num_samples = num_samples
         self.seed = seed
         self.set_epoch(1)

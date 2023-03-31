@@ -21,6 +21,7 @@ class GraphormerSMILESDataset(GraphormerPYGDataset):
         multi_hop_max_dist: int,
         spatial_pos_max: int,
     ):
+        print("smiledataset")
         self.dataset = np.genfromtxt(dataset, delimiter=",", dtype=str)
         num_data = len(self.dataset)
         self.num_class = num_class

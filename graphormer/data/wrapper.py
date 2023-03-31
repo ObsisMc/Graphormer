@@ -16,13 +16,16 @@ from . import algos
 
 @torch.jit.script
 def convert_to_single_emb(x, offset: int = 512):
+    # Obsismc: all feature is int, and feature is considered as vocabulary
+    # offset means vocabulary's size of each feature; add 1 is for later padding (0: need padding, 1: don't need)
     feature_num = x.size(1) if len(x.size()) > 1 else 1
     feature_offset = 1 + torch.arange(0, feature_num * offset, offset, dtype=torch.long)
-    x = x + feature_offset
+    x = x + feature_offset  # Obsismc: x -> (N,D), feat_offset -> (1, D)
     return x
 
 
 def preprocess_item(item):
+    # Obsismc: item is a pygdataset
     edge_attr, edge_index, x = item.edge_attr, item.edge_index, item.x
     N = x.size(0)
     x = convert_to_single_emb(x)
@@ -36,11 +39,13 @@ def preprocess_item(item):
         edge_attr = edge_attr[:, None]
     attn_edge_type = torch.zeros([N, N, edge_attr.size(-1)], dtype=torch.long)
     attn_edge_type[edge_index[0, :], edge_index[1, :]] = (
-        convert_to_single_emb(edge_attr) + 1
+            convert_to_single_emb(edge_attr) + 1  # Obsismc: for padding, 0 needs padding, 1 doesn't need
     )
 
     shortest_path_result, path = algos.floyd_warshall(adj.numpy())
     max_dist = np.amax(shortest_path_result)
+    # print("max dist", max_dist, "ratio of over ",
+    #       np.where(shortest_path_result == 510)[0].shape[0] / ((1 + N) * N))
     edge_input = algos.gen_edge_input(max_dist, path, attn_edge_type.numpy())
     spatial_pos = torch.from_numpy((shortest_path_result)).long()
     attn_bias = torch.zeros([N + 1, N + 1], dtype=torch.float)  # with graph token
@@ -53,6 +58,8 @@ def preprocess_item(item):
     item.in_degree = adj.long().sum(dim=1).view(-1)
     item.out_degree = item.in_degree  # for undirected graph
     item.edge_input = torch.from_numpy(edge_input).long()
+
+    # print("wrapper edge_input shape", edge_input.shape)
 
     return item
 

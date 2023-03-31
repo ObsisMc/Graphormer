@@ -238,7 +238,6 @@ class GraphormerEncoder(FairseqEncoder):
         if self.lm_output_learned_bias is not None:
             x = x + self.lm_output_learned_bias
 
-        # Obsismc: whether only use virtual node to predict TODO
         return x
 
     def max_nodes(self):

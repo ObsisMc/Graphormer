@@ -110,7 +110,7 @@ def collator(items, max_node=512, multi_hop_max_dist=20, spatial_pos_max=20):
         [pad_spatial_pos_unsqueeze(i, max_node_num) for i in spatial_poses]
     )
     in_degree = torch.cat([pad_1d_unsqueeze(i, max_node_num) for i in in_degrees])
-
+    # print("after collater edge_input shape", edge_input.shape)
     return dict(
         idx=torch.LongTensor(idxs),
         attn_bias=attn_bias,

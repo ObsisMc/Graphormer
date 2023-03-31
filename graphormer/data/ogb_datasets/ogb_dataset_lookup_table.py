@@ -10,6 +10,7 @@ from ..pyg_datasets import GraphormerPYGDataset
 import torch.distributed as dist
 import os
 
+
 class MyPygPCQM4Mv2Dataset(PygPCQM4Mv2Dataset):
     def download(self):
         if not dist.is_initialized() or dist.get_rank() == 0:
@@ -59,6 +60,7 @@ class OGBDatasetLookupTable:
         train_idx = None
         valid_idx = None
         test_idx = None
+        print(f"ogb lookup {dataset_name}")
         if dataset_name == "ogbg-molhiv":
             folder_name = dataset_name.replace("-", "_")
             os.system(f"mkdir -p dataset/{folder_name}/")
@@ -95,6 +97,8 @@ class OGBDatasetLookupTable:
             test_idx = idx_split["test"]
         else:
             raise ValueError(f"Unknown dataset name {dataset_name} for ogb source.")
+        print("inner data", inner_dataset.data.edge_attr.shape, inner_dataset.data.edge_attr[0:5],
+              inner_dataset.data.x.shape, inner_dataset.data.x[0:5])
         return (
             None
             if inner_dataset is None
